@@ -1,0 +1,720 @@
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500;600&display=swap');
+  :root {
+    --sage: #abc270;
+    --gold: #fec868;
+    --amber: #fda769;
+    --earth: #473c33;
+    --sage-light: #d8e9b4;
+    --gold-light: #fff3d0;
+    --amber-light: #fde8d4;
+    --earth-light: #8c7a6d;
+    --bg: #faf8f4;
+    --card-bg: #ffffff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: transparent; font-family: 'DM Sans', sans-serif; color: var(--earth); }
+
+  .hero {
+    background: var(--earth);
+    border-radius: 16px;
+    padding: 28px 32px 24px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: var(--sage);
+    opacity: 0.15;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -30px; left: 20%;
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    background: var(--gold);
+    opacity: 0.12;
+  }
+  .hero-badge {
+    display: inline-block;
+    background: var(--sage);
+    color: var(--earth);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-bottom: 12px;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+  }
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    color: #fff;
+    font-size: 28px;
+    line-height: 1.2;
+    margin-bottom: 8px;
+  }
+  .hero h1 span { color: var(--gold); }
+  .hero p { color: rgba(255,255,255,0.65); font-size: 13px; font-weight: 300; }
+
+  .palette-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+  }
+  .swatch {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: rgba(255,255,255,0.7);
+  }
+  .swatch-dot {
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(255,255,255,0.2);
+  }
+
+  .tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+  .tab {
+    padding: 7px 16px;
+    border-radius: 20px;
+    border: 1.5px solid var(--earth);
+    background: transparent;
+    color: var(--earth);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .tab:hover { background: var(--earth-light); color: #fff; border-color: var(--earth-light); }
+  .tab.active { background: var(--earth); color: #fff; }
+
+  .section { display: none; }
+  .section.active { display: block; }
+
+  .phase-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 14px;
+  }
+  .phase-card {
+    border-radius: 12px;
+    padding: 18px;
+    border: 1.5px solid transparent;
+    position: relative;
+    overflow: hidden;
+  }
+  .phase-card.sage { background: var(--sage-light); border-color: var(--sage); }
+  .phase-card.gold { background: var(--gold-light); border-color: var(--gold); }
+  .phase-card.amber { background: var(--amber-light); border-color: var(--amber); }
+  .phase-card.earth { background: #ede8e3; border-color: var(--earth-light); }
+
+  .phase-num {
+    font-size: 42px;
+    font-weight: 700;
+    font-family: 'Playfair Display', serif;
+    opacity: 0.12;
+    position: absolute;
+    top: 8px; right: 14px;
+    line-height: 1;
+    color: var(--earth);
+  }
+  .phase-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    opacity: 0.7;
+  }
+  .phase-title {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .phase-duration {
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 12px;
+    display: inline-block;
+    margin-bottom: 12px;
+    font-weight: 500;
+  }
+  .sage .phase-duration { background: var(--sage); color: var(--earth); }
+  .gold .phase-duration { background: var(--gold); color: var(--earth); }
+  .amber .phase-duration { background: var(--amber); color: var(--earth); }
+  .earth .phase-duration { background: var(--earth); color: #fff; }
+
+  .task-list { list-style: none; }
+  .task-list li {
+    font-size: 12.5px;
+    padding: 4px 0;
+    border-bottom: 1px dashed rgba(71,60,51,0.15);
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+  }
+  .task-list li:last-child { border-bottom: none; }
+  .task-list li::before { content: '→'; opacity: 0.5; flex-shrink: 0; margin-top: 1px; }
+
+  .arch-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .arch-card {
+    background: var(--card-bg);
+    border: 1px solid rgba(71,60,51,0.15);
+    border-radius: 10px;
+    padding: 14px;
+  }
+  .arch-card h4 {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 8px;
+    opacity: 0.6;
+  }
+  .tech-pill {
+    display: inline-block;
+    padding: 3px 9px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 500;
+    margin: 2px;
+  }
+  .tech-pill.sage { background: var(--sage); color: var(--earth); }
+  .tech-pill.gold { background: var(--gold); color: var(--earth); }
+  .tech-pill.amber { background: var(--amber); color: var(--earth); }
+  .tech-pill.earth { background: var(--earth); color: #fff; }
+  .tech-pill.outline { background: transparent; border: 1px solid rgba(71,60,51,0.3); }
+
+  .screen-flow {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    margin-bottom: 16px;
+  }
+  .screen-card {
+    min-width: 130px;
+    background: var(--earth);
+    border-radius: 10px;
+    padding: 10px;
+    flex-shrink: 0;
+    position: relative;
+  }
+  .screen-card .screen-top {
+    background: rgba(255,255,255,0.06);
+    border-radius: 6px;
+    padding: 6px 8px;
+    margin-bottom: 8px;
+  }
+  .screen-card .screen-label {
+    color: rgba(255,255,255,0.5);
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+  }
+  .screen-card .screen-name {
+    color: #fff;
+    font-size: 12px;
+    font-weight: 500;
+    margin: 2px 0 6px;
+  }
+  .screen-mini-el {
+    height: 6px;
+    border-radius: 3px;
+    margin: 3px 0;
+    opacity: 0.4;
+  }
+  .screen-arrow {
+    position: absolute;
+    right: -14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--earth-light);
+    font-size: 16px;
+    z-index: 2;
+  }
+
+  .prompt-box {
+    background: var(--earth);
+    border-radius: 12px;
+    padding: 20px 24px;
+    position: relative;
+  }
+  .prompt-box h3 {
+    color: var(--gold);
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+  }
+  .prompt-text {
+    color: rgba(255,255,255,0.88);
+    font-size: 12.5px;
+    line-height: 1.75;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .prompt-text .highlight { color: var(--gold); font-weight: 500; }
+  .prompt-text .section-head {
+    color: var(--sage);
+    font-weight: 600;
+    display: block;
+    margin-top: 12px;
+    margin-bottom: 2px;
+    font-size: 12px;
+  }
+
+  .copy-btn {
+    position: absolute;
+    top: 14px; right: 14px;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: rgba(255,255,255,0.7);
+    font-size: 11px;
+    padding: 5px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.2s;
+  }
+  .copy-btn:hover { background: rgba(255,255,255,0.18); }
+
+  .checklist-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 10px;
+  }
+  .check-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    background: #fff;
+    border: 1px solid rgba(71,60,51,0.1);
+    font-size: 12.5px;
+  }
+  .check-dot {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+    margin-top: 1px;
+  }
+  .check-dot.sage { background: var(--sage); color: var(--earth); }
+  .check-dot.gold { background: var(--gold); color: var(--earth); }
+  .check-dot.amber { background: var(--amber); color: var(--earth); }
+
+  .section-title {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--earth-light);
+    margin: 0 0 10px;
+  }
+
+  .timeline-bar {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 20px;
+    background: rgba(71,60,51,0.08);
+    border-radius: 8px;
+    padding: 4px;
+  }
+  .tl-seg {
+    flex: 1;
+    text-align: center;
+    padding: 6px 4px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+  .tl-seg.sage { background: var(--sage); color: var(--earth); }
+  .tl-seg.gold { background: var(--gold); color: var(--earth); }
+  .tl-seg.amber { background: var(--amber); color: var(--earth); }
+  .tl-seg.earth { background: var(--earth); color: #fff; }
+  .tl-seg div:first-child { font-size: 9px; opacity: 0.8; }
+</style>
+
+<div class="hero">
+  <div class="hero-badge">Project 09 · MindMatrix</div>
+  <h1>Raitha-<span>Varta</span><br>Production Blueprint</h1>
+  <p>Android AgriTech App · GenAI-Powered Flash-Card Advisor · 0 to 100 Plan</p>
+  <div class="palette-row">
+    <div class="swatch"><div class="swatch-dot" style="background:#abc270"></div>#abc270</div>
+    <div class="swatch"><div class="swatch-dot" style="background:#fec868"></div>#fec868</div>
+    <div class="swatch"><div class="swatch-dot" style="background:#fda769"></div>#fda769</div>
+    <div class="swatch"><div class="swatch-dot" style="background:#473c33"></div>#473c33</div>
+  </div>
+</div>
+
+<div class="tabs" id="tabBar">
+  <button class="tab active" onclick="switchTab('phases')">📋 Phases</button>
+  <button class="tab" onclick="switchTab('arch')">🏗️ Architecture</button>
+  <button class="tab" onclick="switchTab('screens')">📱 UI Screens</button>
+  <button class="tab" onclick="switchTab('prompt')">🤖 Master Prompt</button>
+  <button class="tab" onclick="switchTab('criteria')">✅ Checklist</button>
+</div>
+
+<!-- PHASES -->
+<div class="section active" id="phases">
+  <div class="timeline-bar">
+    <div class="tl-seg sage"><div>WEEK 1</div>Foundation</div>
+    <div class="tl-seg gold"><div>WEEK 2</div>Core App</div>
+    <div class="tl-seg amber"><div>WEEK 3</div>GenAI Layer</div>
+    <div class="tl-seg earth"><div>WEEK 4</div>Polish & Ship</div>
+  </div>
+  <div class="phase-grid">
+    <div class="phase-card sage">
+      <div class="phase-num">01</div>
+      <div class="phase-label">Week 1</div>
+      <div class="phase-title">Project Setup & Architecture</div>
+      <div class="phase-duration">Days 1–7</div>
+      <ul class="task-list">
+        <li>Create Android project in Kotlin + Jetpack Compose</li>
+        <li>Setup Gradle with all dependencies (Room, Retrofit, Glide, Hilt)</li>
+        <li>Define color theme: #abc270, #fec868, #fda769, #473c33</li>
+        <li>Create data models: Tip, Crop, SuccessStory, Expert</li>
+        <li>Setup Room DB schema + DAOs + migrations</li>
+        <li>Configure Hilt DI modules (DB, Network, Repo)</li>
+        <li>Create base ViewModel + Repository pattern</li>
+        <li>Setup Google Gemini API integration scaffold</li>
+        <li>Create multilingual string resources (English + Kannada)</li>
+      </ul>
+    </div>
+    <div class="phase-card gold">
+      <div class="phase-num">02</div>
+      <div class="phase-label">Week 2</div>
+      <div class="phase-title">Core Screens & Navigation</div>
+      <div class="phase-duration">Days 8–14</div>
+      <ul class="task-list">
+        <li>Splash screen with app logo + instant tip pre-load</li>
+        <li>Bottom nav: Home, Crops, Stories, Expert</li>
+        <li>Flash-Card swipe screen (ViewPager2 + custom animations)</li>
+        <li>Daily Tip card UI with crop image (Glide) + 2-sentence text</li>
+        <li>Crop category filter bar (Paddy, Areca, Coconut, Tomato)</li>
+        <li>Offline Room DB seed with 50+ pre-loaded tips</li>
+        <li>Tip detail expand animation + share functionality</li>
+        <li>Success story card list (RecyclerView + farmer photos)</li>
+      </ul>
+    </div>
+    <div class="phase-card amber">
+      <div class="phase-num">03</div>
+      <div class="phase-label">Week 3</div>
+      <div class="phase-title">GenAI Integration & Expert Ask</div>
+      <div class="phase-duration">Days 15–21</div>
+      <ul class="task-list">
+        <li>Integrate Google Gemini 1.5 Flash via REST API</li>
+        <li>Build prompt engine: crop + district + season → tip generation</li>
+        <li>Expert Ask screen: photo capture via CameraX</li>
+        <li>Image-to-Base64 + Gemini Vision API for disease detection</li>
+        <li>Streaming response display with typing animation</li>
+        <li>Auto-translate AI response to Kannada via AI prompt</li>
+        <li>Cache AI responses in Room DB to avoid repeat calls</li>
+        <li>Fallback to offline tips if API fails (no-network UX)</li>
+      </ul>
+    </div>
+    <div class="phase-card earth">
+      <div class="phase-num">04</div>
+      <div class="phase-label">Week 4</div>
+      <div class="phase-title">Polishing, Testing & Release</div>
+      <div class="phase-duration">Days 22–28</div>
+      <ul class="task-list">
+        <li>High-contrast dark/light mode with brand palette</li>
+        <li>Accessibility: content descriptions, large touch targets</li>
+        <li>Performance: cold-start under 1.5s, ProGuard optimization</li>
+        <li>Unit tests: ViewModel, Repository, Room DAOs</li>
+        <li>UI tests: Espresso flows for all major screens</li>
+        <li>APK size optimization (vector drawables, WebP images)</li>
+        <li>App icon, splash screen, Play Store assets</li>
+        <li>Beta APK generation + documentation</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ARCHITECTURE -->
+<div class="section" id="arch">
+  <p class="section-title">Tech Stack</p>
+  <div class="arch-grid">
+    <div class="arch-card">
+      <h4>Language & UI</h4>
+      <span class="tech-pill sage">Kotlin</span>
+      <span class="tech-pill sage">Jetpack Compose</span>
+      <span class="tech-pill gold">Material 3</span>
+      <span class="tech-pill gold">ViewPager2</span>
+      <span class="tech-pill amber">CameraX</span>
+    </div>
+    <div class="arch-card">
+      <h4>Architecture</h4>
+      <span class="tech-pill sage">MVVM</span>
+      <span class="tech-pill sage">Clean Architecture</span>
+      <span class="tech-pill gold">Hilt DI</span>
+      <span class="tech-pill gold">StateFlow</span>
+      <span class="tech-pill amber">Coroutines</span>
+    </div>
+    <div class="arch-card">
+      <h4>Data Layer</h4>
+      <span class="tech-pill sage">Room DB</span>
+      <span class="tech-pill gold">Retrofit 2</span>
+      <span class="tech-pill amber">OkHttp Logging</span>
+      <span class="tech-pill outline">DataStore Prefs</span>
+    </div>
+    <div class="arch-card">
+      <h4>GenAI & Media</h4>
+      <span class="tech-pill earth">Gemini 1.5 Flash</span>
+      <span class="tech-pill amber">Vision API</span>
+      <span class="tech-pill gold">Glide</span>
+      <span class="tech-pill outline">Coil (Compose)</span>
+    </div>
+    <div class="arch-card">
+      <h4>Testing</h4>
+      <span class="tech-pill sage">JUnit 5</span>
+      <span class="tech-pill gold">Mockk</span>
+      <span class="tech-pill amber">Espresso</span>
+      <span class="tech-pill outline">Turbine (Flow)</span>
+    </div>
+    <div class="arch-card">
+      <h4>Localization</h4>
+      <span class="tech-pill earth">Kannada strings</span>
+      <span class="tech-pill sage">AI auto-translate</span>
+      <span class="tech-pill gold">RTL-ready</span>
+    </div>
+  </div>
+
+  <p class="section-title">Module Structure</p>
+  <div class="prompt-box" style="padding: 16px 20px;">
+    <div class="prompt-text" style="font-family: monospace; font-size: 11.5px; line-height: 1.9;">
+      <span style="color: var(--gold);">raitha-varta/</span><br>
+      &nbsp;&nbsp;<span style="color: var(--sage);">app/</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: rgba(255,255,255,0.7);">src/main/</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: var(--amber);">data/</span>  <span style="opacity:0.4;">← Room DB, API, Repos</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: var(--amber);">domain/</span> <span style="opacity:0.4;">← Use Cases, Models</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: var(--amber);">ui/</span>     <span style="opacity:0.4;">← Screens, ViewModels</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: var(--amber);">di/</span>     <span style="opacity:0.4;">← Hilt Modules</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: var(--amber);">utils/</span>  <span style="opacity:0.4;">← Extensions, Helpers</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: rgba(255,255,255,0.7);">res/</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: var(--sage);">values/strings.xml</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: var(--sage);">values-kn/strings.xml</span>
+    </div>
+  </div>
+</div>
+
+<!-- SCREENS -->
+<div class="section" id="screens">
+  <p class="section-title">App Screen Flow</p>
+  <div class="screen-flow">
+    <div class="screen-card">
+      <div class="screen-top">
+        <div class="screen-label">Screen 1</div>
+        <div class="screen-name">Splash</div>
+      </div>
+      <div class="screen-mini-el" style="background:var(--sage); width:60%;"></div>
+      <div class="screen-mini-el" style="background:var(--gold); width:80%;"></div>
+      <div class="screen-mini-el" style="background:rgba(255,255,255,0.2); width:50%;"></div>
+      <div class="screen-arrow">›</div>
+    </div>
+    <div class="screen-card" style="margin-left:10px">
+      <div class="screen-top">
+        <div class="screen-label">Screen 2</div>
+        <div class="screen-name">Flash Cards</div>
+      </div>
+      <div style="background:var(--sage);border-radius:6px;height:50px;margin:4px 0;opacity:0.8;"></div>
+      <div class="screen-mini-el" style="background:var(--gold); width:90%;"></div>
+      <div class="screen-mini-el" style="background:rgba(255,255,255,0.2); width:70%;"></div>
+      <div class="screen-arrow">›</div>
+    </div>
+    <div class="screen-card" style="margin-left:10px">
+      <div class="screen-top">
+        <div class="screen-label">Screen 3</div>
+        <div class="screen-name">Crop Filter</div>
+      </div>
+      <div style="display:flex;gap:3px;margin:4px 0">
+        <div style="background:var(--sage);border-radius:8px;padding:3px 5px;font-size:8px;color:var(--earth);font-weight:600;">Paddy</div>
+        <div style="background:rgba(255,255,255,0.15);border-radius:8px;padding:3px 5px;font-size:8px;color:rgba(255,255,255,0.5);">Areca</div>
+      </div>
+      <div class="screen-mini-el" style="background:rgba(255,255,255,0.2); width:90%;"></div>
+      <div class="screen-mini-el" style="background:rgba(255,255,255,0.2); width:75%;"></div>
+      <div class="screen-arrow">›</div>
+    </div>
+    <div class="screen-card" style="margin-left:10px">
+      <div class="screen-top">
+        <div class="screen-label">Screen 4</div>
+        <div class="screen-name">Success Story</div>
+      </div>
+      <div style="display:flex;gap:4px;align-items:center;margin:4px 0">
+        <div style="width:24px;height:24px;border-radius:50%;background:var(--amber);opacity:0.8;"></div>
+        <div>
+          <div class="screen-mini-el" style="background:rgba(255,255,255,0.5); width:70px; margin:0;"></div>
+          <div class="screen-mini-el" style="background:rgba(255,255,255,0.2); width:50px; margin:2px 0 0;"></div>
+        </div>
+      </div>
+      <div class="screen-arrow">›</div>
+    </div>
+    <div class="screen-card" style="margin-left:10px">
+      <div class="screen-top">
+        <div class="screen-label">Screen 5</div>
+        <div class="screen-name">Expert Ask</div>
+      </div>
+      <div style="background:rgba(253,167,105,0.3);border-radius:6px;height:44px;margin:4px 0;display:flex;align-items:center;justify-content:center;">
+        <div style="width:20px;height:20px;border-radius:50%;background:var(--amber);opacity:0.8;"></div>
+      </div>
+      <div class="screen-mini-el" style="background:var(--amber); width:80%;"></div>
+    </div>
+  </div>
+
+  <p class="section-title">UI Design Tokens</p>
+  <div class="arch-grid">
+    <div class="arch-card">
+      <h4>Primary Actions</h4>
+      <div style="background:#abc270;border-radius:8px;padding:8px 12px;font-size:12px;font-weight:600;color:#473c33;margin:4px 0;">Swipe Card ›</div>
+      <div style="background:#473c33;border-radius:8px;padding:8px 12px;font-size:12px;font-weight:600;color:#fff;margin:4px 0;">Ask Expert</div>
+    </div>
+    <div class="arch-card">
+      <h4>Crop Chips</h4>
+      <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px">
+        <span style="background:#fec868;color:#473c33;padding:4px 10px;border-radius:12px;font-size:11px;font-weight:600;">Paddy</span>
+        <span style="background:#fda769;color:#473c33;padding:4px 10px;border-radius:12px;font-size:11px;font-weight:600;">Areca</span>
+        <span style="background:#abc270;color:#473c33;padding:4px 10px;border-radius:12px;font-size:11px;font-weight:600;">Coconut</span>
+        <span style="background:#473c33;color:#fff;padding:4px 10px;border-radius:12px;font-size:11px;font-weight:600;">Tomato</span>
+      </div>
+    </div>
+    <div class="arch-card">
+      <h4>Typography</h4>
+      <div style="font-size:16px;font-weight:700;color:#473c33;margin:2px 0;">Noto Sans Kannada</div>
+      <div style="font-size:13px;color:#8c7a6d;">Body: 14sp Regular</div>
+      <div style="font-size:13px;color:#8c7a6d;">Heading: 20sp Bold</div>
+      <div style="font-size:11px;color:#abc270;font-weight:600;">Card Tip: 15sp Medium</div>
+    </div>
+  </div>
+</div>
+
+<!-- MASTER PROMPT -->
+<div class="section" id="prompt">
+  <div class="prompt-box" style="position:relative">
+    <h3>🤖 Master Prompt — Zero Human Intervention</h3>
+    <button class="copy-btn" onclick="copyPrompt()">Copy</button>
+    <div class="prompt-text" id="masterPromptText">
+<span class="section-head">## SYSTEM CONTEXT</span>
+You are an expert Android developer. Build a <span class="highlight">complete, production-ready</span> Android app called <span class="highlight">Raitha-Varta</span> — a GenAI-powered agricultural Flash-Card advisor for farmers in Karnataka, India. Write <span class="highlight">100% working Kotlin code</span> with zero placeholders, zero TODOs, and zero stubs. Every file must compile and run immediately.
+
+<span class="section-head">## COLOR PALETTE (Mandatory)</span>
+<span class="highlight">Sage Green: #abc270 · Gold: #fec868 · Amber: #fda769 · Earth Brown: #473c33</span>
+Apply these as MaterialTheme colors. Use Sage for primary, Gold for secondary, Amber for tertiary, Earth for background/text.
+
+<span class="section-head">## DELIVERABLE 1 — Project Setup Files</span>
+Generate these complete files:
+1. build.gradle (app) with all dependencies: Compose BOM, Room 2.6, Hilt, Retrofit, Glide, CameraX, Gemini SDK
+2. AndroidManifest.xml with INTERNET, CAMERA, READ_EXTERNAL_STORAGE permissions
+3. Theme.kt with MaterialTheme using exact hex palette above
+4. Type.kt with Noto Sans Kannada for all text styles
+
+<span class="section-head">## DELIVERABLE 2 — Data Layer</span>
+Generate complete working files:
+1. TipEntity.kt (Room @Entity: id, title, description, cropType, imageUrl, isKannada, district, season)
+2. TipDao.kt (getAllTips, getTipsByCrop, getDailyTip, insertAll)
+3. AppDatabase.kt (Room @Database with SeedCallback inserting 30+ real farming tips)
+4. GeminiApiService.kt (Retrofit interface for Gemini 1.5 Flash REST API)
+5. TipRepository.kt (offline-first: Room → API fallback)
+
+<span class="section-head">## DELIVERABLE 3 — UI Screens (Jetpack Compose)</span>
+Generate full Composable screens:
+1. SplashScreen.kt — logo + animated crop icon, pre-loads Room DB tip
+2. HomeScreen.kt — ViewPager2-style HorizontalPager with swipeable FlashCards
+3. FlashCardItem.kt — Composable card with crop image, 2-sentence tip, crop chip badge
+4. CropFilterScreen.kt — horizontal scrollable chip row: Paddy, Areca Nut, Coconut, Tomato
+5. SuccessStoryScreen.kt — farmer story cards with name, crop, yield improvement %
+6. ExpertAskScreen.kt — CameraX preview + capture + Gemini Vision disease detection
+
+<span class="section-head">## DELIVERABLE 4 — GenAI Integration</span>
+1. GeminiService.kt — complete Gemini 1.5 Flash integration:
+   - generateDailyTip(crop: String, district: String, season: String): String
+   - analyzePlantDisease(imageBase64: String): String
+   - translateToKannada(text: String): String
+2. All prompts must request 2-sentence actionable format
+3. Cache results in Room DB (field: geminiCachedResponse)
+4. Graceful fallback to offline tips if API unavailable
+
+<span class="section-head">## DELIVERABLE 5 — Navigation</span>
+NavGraph.kt with NavHost, BottomNavigation bar (Home, Crops, Stories, Expert Ask), proper back-stack handling, and deep-link support.
+
+<span class="section-head">## QUALITY REQUIREMENTS (Non-negotiable)</span>
+- App MUST load Daily Tip on first frame (pre-load in Application.onCreate)
+- Flash-Cards MUST support Kannada (Noto Sans Kannada font loaded)
+- High-contrast UI: minimum 4.5:1 contrast ratio for all text
+- Cold start under 1.5 seconds
+- No internet = app works perfectly from Room DB seed data
+- All string literals in strings.xml AND values-kn/strings.xml
+- Generate BOTH files simultaneously
+
+<span class="section-head">## OUTPUT FORMAT</span>
+For each file: write ```kotlin filename.kt then the complete file. No explanations between files. No partial files. If a file exceeds output limit, write [CONTINUE] and I will ask you to continue — do NOT truncate mid-function.
+    </div>
+  </div>
+</div>
+
+<!-- CHECKLIST -->
+<div class="section" id="criteria">
+  <p class="section-title">Success Criteria Checklist</p>
+  <div class="checklist-grid">
+    <div class="check-item"><div class="check-dot sage">✓</div><div><strong>Instant Daily Tip</strong> — loads on app startup from Room DB, no network required</div></div>
+    <div class="check-item"><div class="check-dot sage">✓</div><div><strong>Kannada Flash-Cards</strong> — Noto Sans Kannada font, all tips bilingual (EN + KN)</div></div>
+    <div class="check-item"><div class="check-dot sage">✓</div><div><strong>High-Contrast UI</strong> — #473c33 on #fec868 = 7.2:1 ratio, WCAG AAA</div></div>
+    <div class="check-item"><div class="check-dot gold">✓</div><div><strong>Crop Categories</strong> — Paddy, Areca Nut, Coconut, Tomato filter chips</div></div>
+    <div class="check-item"><div class="check-dot gold">✓</div><div><strong>Swipe Flash-Cards</strong> — HorizontalPager with card-stack animation</div></div>
+    <div class="check-item"><div class="check-dot gold">✓</div><div><strong>Offline-First</strong> — 50+ tips seeded in Room DB, works without internet</div></div>
+    <div class="check-item"><div class="check-dot amber">✓</div><div><strong>GenAI Tips</strong> — Gemini 1.5 Flash generates district+season-specific advice</div></div>
+    <div class="check-item"><div class="check-dot amber">✓</div><div><strong>Disease Detection</strong> — CameraX + Gemini Vision identifies crop diseases</div></div>
+    <div class="check-item"><div class="check-dot amber">✓</div><div><strong>Cold Start &lt; 1.5s</strong> — ProGuard + R8 + splash pre-load optimization</div></div>
+    <div class="check-item"><div class="check-dot sage">✓</div><div><strong>Success Stories</strong> — local farmer testimonial cards with yield data</div></div>
+    <div class="check-item"><div class="check-dot gold">✓</div><div><strong>Zero Human Intervention</strong> — all prompts engineered for full autonomous generation</div></div>
+    <div class="check-item"><div class="check-dot amber">✓</div><div><strong>Clean Architecture</strong> — MVVM + Repository + Hilt DI, fully testable</div></div>
+  </div>
+  <div style="margin-top:16px; padding:14px 18px; background:linear-gradient(135deg, #abc270 0%, #fec868 100%); border-radius:10px; text-align:center; cursor:pointer;" onclick="sendPrompt('Generate Deliverable 1 of Raitha-Varta: all project setup files including build.gradle, AndroidManifest.xml, Theme.kt and Type.kt with the exact color palette #abc270 #fec868 #fda769 #473c33')">
+    <div style="font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:#473c33;margin-bottom:2px;">Ready to Build?</div>
+    <div style="font-size:14px;font-weight:700;color:#473c33;">▶ Start Generating Deliverable 1 ↗</div>
+  </div>
+</div>
+
+<script>
+function switchTab(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+}
+function copyPrompt() {
+  const text = document.getElementById('masterPromptText').innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.querySelector('.copy-btn');
+    btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = 'Copy', 2000);
+  });
+}
+</script>
